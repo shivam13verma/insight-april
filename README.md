@@ -19,4 +19,4 @@ The process_log.py source code contains 6 kinds of features/analytics:
 
 Note: 
 - Features 5 & 6 are not computed by default. Set `run_extra_features = True` inside main() to compute them.
-- The 10,000 logs file gets execute in less than a minute, while the 100,000 logs file is executed within 3-4 minutes. Further speedup can be achieved by using parallelization (i.e. offloading different analytics/feature jobs to different cores).
+- The 10,000 logs file gets executed in less than a minute, while the 100,000 logs file is executed within 3-4 minutes. Further speedup can be achieved by using parallelization (i.e. offloading different analytics/feature jobs to different cores).
