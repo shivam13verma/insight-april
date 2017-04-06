@@ -30,6 +30,7 @@ def run_feature1(out1_path, inp_list):
                 pass
 
 
+
 def run_feature2(out2_path, inp_list):
     """
     Feature 2: Identify the top 10 resources on the site that consume the most bandwidth.
@@ -194,6 +195,70 @@ def run_feature4(out4_path, inp_list, inp):
             f.write(out_blocked[i]+"\n")
 
 
+def run_feature5(out5_path, inp_list):
+    """
+    Feature 5: Decreasing count of HTTP reply codes.
+    """
+    http = {} #looks like {http1: count1, ...}
+    for inp in inp_list: #for each request
+        try:
+            if http[inp[3]]:
+                http[inp[3]] += 1 #update host-count dictionary
+        except KeyError:
+            http[inp[3]] = 1
+
+    #lexicographic sort by host counts
+    sorted_http = sorted(http.items(), key=lambda x: (-x[1],x[0]))
+
+    with open(out5_path,'wb') as f:
+        for i in range(10):
+            try:
+                f.write(sorted_http[i][0]+","+str(sorted_http[i][1])+"\n")
+            except IndexError:
+                pass
+
+def run_feature6(out6_path, inp_list):
+    """
+    Feature 6: Quantify activity of top 10 hosts/IPs (feature 1) across the day (60-minute intervals).
+    """
+
+    hosts = {} #looks like {host1: count1, ...}
+    for inp in inp_list: #for each request
+        try:
+            if hosts[inp[0]]:
+                hosts[inp[0]] += 1 #update host-count dictionary
+        except KeyError:
+            hosts[inp[0]] = 1
+
+    #lexicographic sort by host counts
+    sorted_hosts = sorted(hosts.items(), key=lambda x: (-x[1],x[0]))
+
+    top10_hosts = dict(sorted_hosts[:10]).keys()
+
+    host_activity = {} #looks like {host1: [count1, count2, ..., count24], ...} i.e. count for each hour
+
+    #initialize
+    for host in top10_hosts:
+        host_activity[host] = [0]*24
+
+    for inp in inp_list: #for each request
+        if inp[0] in top10_hosts:
+            t = convert_to_datetime(inp[1])
+            # print inp[0],t
+            try:
+                host_activity[inp[0]][t.hour] += 1 #update host-count dictionary
+            except ValueError:
+                host_activity[inp[0]][0] += 1
+
+    with open(out6_path,'wb') as f:
+        for i in top10_hosts: #for each top host
+            for h in range(24): #for each hour
+                try:
+                    f.write(str(i)+","+str(h)+","+str(host_activity[i][h])+"\n")
+                except IndexError:
+                    pass
+
+
 
 def main():
 
@@ -201,12 +266,17 @@ def main():
     for arg in sys.argv:
         args.append(arg)
 
-    #read input and output paths
+    #read input and output paths for default features.
     input_path = str(args[1])
     out1_path = str(args[2])
     out2_path = str(args[3])
     out3_path = str(args[4])
     out4_path = str(args[5])
+
+    #set True to run extra features and generate outputs below.
+    run_extra_features = False
+    out5_path = './log_output/feat5.txt'
+    out6_path = './log_output/feat6.txt'
 
     inp = []
     with open(input_path,'r') as f:
@@ -236,6 +306,10 @@ def main():
     run_feature2(out2_path, inp_list)
     run_feature3(out3_path, inp_list)
     run_feature4(out4_path, inp_list, inp)
+
+    if run_extra_features: #default False
+        run_feature5(out5_path, inp_list)
+        run_feature6(out6_path, inp_list)
 
 if __name__ == '__main__':
     main()
