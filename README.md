@@ -17,4 +17,6 @@ The process_log.py source code contains 6 kinds of features/analytics:
 - Feature 5: Decreasing count of HTTP reply codes (gives us an estimate of the number of login failures). Output saved at `log_output/feat5.txt`.
 - Feature 6: Quantify activity of top 10 hosts/IPs (feature 1) across the day (60-minute intervals). This gives us insight into user behavior and how the most active users spend their time on the website throughout the day. Output saved at `log_output/feat6.txt`.
 
-Note: The 10,000 logs file gets execute in less than a minute, while the 100,000 logs file is executed within 3-4 minutes. Further speedup can be achieved by using parallelization (i.e. offloading different analytics/feature jobs to different cores).
+Note: 
+- Features 5 & 6 are not computed by default. Set `run_extra_features = True` inside main() to compute them.
+- The 10,000 logs file gets execute in less than a minute, while the 100,000 logs file is executed within 3-4 minutes. Further speedup can be achieved by using parallelization (i.e. offloading different analytics/feature jobs to different cores).
